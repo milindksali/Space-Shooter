@@ -1534,35 +1534,5 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8293156516700990518, guid: 65f133077dc566b4b82fd0bf4d197761,
-        type: 3}
-      propertyPath: _spawnManager
-      value: 
-      objectReference: {fileID: 741762239}
-    - target: {fileID: 8293156516700990518, guid: 65f133077dc566b4b82fd0bf4d197761,
-        type: 3}
-      propertyPath: _uiManager
-      value: 
-      objectReference: {fileID: 922936125}
-    - target: {fileID: 8293156516700990518, guid: 65f133077dc566b4b82fd0bf4d197761,
-        type: 3}
-      propertyPath: _powerupSpeed
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8293156516700990518, guid: 65f133077dc566b4b82fd0bf4d197761,
-        type: 3}
-      propertyPath: _thrusterSpeedMultiplier
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8293156516700990518, guid: 65f133077dc566b4b82fd0bf4d197761,
-        type: 3}
-      propertyPath: _powerupSpeedMultiplier
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8293156516700990518, guid: 65f133077dc566b4b82fd0bf4d197761,
-        type: 3}
-      propertyPath: _ammoOutSound
-      value: 
-      objectReference: {fileID: 8300000, guid: d10a2b7fcb2dcd3428d1d8bd95d56a27, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 65f133077dc566b4b82fd0bf4d197761, type: 3}

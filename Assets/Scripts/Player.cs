@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
     private float _canFire = -1f;
     [SerializeField]    private int _lives = 3;
     [SerializeField]    private AudioClip _ammoOutSound;
+    private int _shieldStrength = 3;
 
     //Managers
     private SpawnManager _spawnManager;
@@ -240,8 +241,8 @@ public class Player : MonoBehaviour
     {
         if (_isShieldPowerupActive == true)
         {
-            _isShieldPowerupActive = false;
-            _shieldVisual.SetActive(false);
+            _shieldStrength--;
+            UpdateShieldStrength();
             return;
         }
 
@@ -291,8 +292,8 @@ public class Player : MonoBehaviour
 
     public void ActivateShieldPowerup()
     {
-        _isShieldPowerupActive = true;
-        _shieldVisual.SetActive(true);
+        _shieldStrength = 3;
+        UpdateShieldStrength();
     }
 
     IEnumerator DeactivateTripleShotPowerup()
@@ -324,5 +325,31 @@ public class Player : MonoBehaviour
         _spawnManager.SetLowAmmo(false);
         _ammoCount += value;
         UpdateUIAmmoCount(_ammoCount);
+    }
+
+    public void UpdateShieldStrength()
+    {
+        switch (_shieldStrength)
+        {
+            case 3: //Full Strength, Do nothing
+                _isShieldPowerupActive = true;
+                _shieldVisual.GetComponent<SpriteRenderer>().color = Color.white;
+                _shieldVisual.SetActive(true);
+                break;
+            case 2: //First Hit, change color
+                _shieldVisual.GetComponent<SpriteRenderer>().color = Color.yellow;
+                break;
+            case 1: //Second Hit, change color
+                _shieldVisual.GetComponent<SpriteRenderer>().color = Color.red;
+                break;
+            case 0: //Third Hit, destroy Shield and reset to original color
+                _isShieldPowerupActive = false;
+                _shieldStrength = 3;
+                _shieldVisual.GetComponent<SpriteRenderer>().color = Color.white;
+                _shieldVisual.SetActive(false);
+                break;
+            default:
+                break;
+        }
     }
 }
