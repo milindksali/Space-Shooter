@@ -21,27 +21,29 @@ public class Player : MonoBehaviour
     private float bottomVerticalBound = -3.8f;
 
     //Powerup variables
-    [SerializeField] private GameObject _shieldVisual;
-    [SerializeField] private GameObject _leftEngine, _rightEngine;
+    [SerializeField]    private GameObject _shieldVisual;
+    [SerializeField]    private GameObject _leftEngine, _rightEngine;
     [SerializeField]    private GameObject _tripleShotPrefab;
     [SerializeField]    private GameObject _laserPrefab;
     private float _laserOffset = 0.9f;
     [SerializeField]    private float _fireRate = 0.15f;
     private float _canFire = -1f;
     [SerializeField]    private int _lives = 3;
+    [SerializeField]    private AudioClip _ammoOutSound;
 
     //Managers
     private SpawnManager _spawnManager;
     private UIManager _uiManager;
     private GameManager _gameManager;
 
-
     private bool _isTripleShotPowerupActive = false;
     private bool _isSpeedPowerupActive = false;
     private bool _isShieldPowerupActive = false;
     private bool _isSpeedThrusterActive = false;
 
+    //UI Display
     [SerializeField]    private int _score = 0;
+    [SerializeField]    private int _ammoCount = 15;
 
     private IEnumerator _deactivateSpeedPowerup;
     private IEnumerator _deactivateTripleShotPowerup;
@@ -55,7 +57,6 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         if (_isPlayerOne == true)
         {
             if (Input.GetKey(KeyCode.LeftShift) && _isSpeedPowerupActive == false)
@@ -67,7 +68,14 @@ public class Player : MonoBehaviour
 
             if ((Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)) && Time.time > _canFire)
             {
-                FireLaser();
+                if (_ammoCount <= 0)
+                {
+                    AudioSource.PlayClipAtPoint(_ammoOutSound, transform.position, 1.0f);
+                }
+                else
+                {
+                    FireLaser();
+                }
             }
         }
 
@@ -84,7 +92,14 @@ public class Player : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.KeypadEnter) && Time.time > _canFire)
             {
-                FireLaser();
+                if (_ammoCount <= 0)
+                {
+                    AudioSource.PlayClipAtPoint(_ammoOutSound, transform.position, 1.0f);
+                }
+                else
+                {
+                    FireLaser();
+                }
             }
         }
     }
@@ -127,6 +142,7 @@ public class Player : MonoBehaviour
         _speed = _normalSpeed;
 
         UpdateScore(_score);
+        UpdateAmmoCount(_ammoCount);
     }
 
     void CalculateMovement()
@@ -209,6 +225,12 @@ public class Player : MonoBehaviour
         {
             Instantiate(_laserPrefab, transform.position + new Vector3(0, _laserOffset, 0), Quaternion.identity);
         }
+
+        //Counted Triple shot as single ammo, considering Powerup !!
+        //Hence ammo count is reduced by 1 out of if structure. 
+        //Otherwise can reduce 3 ammo when it's a triple shot, and reduce 1 for regular shot within if condition above.
+        _ammoCount--;
+        UpdateAmmoCount(_ammoCount);
     }
 
     public void Damage()
@@ -287,6 +309,11 @@ public class Player : MonoBehaviour
         _score += updateValue;
 
         _uiManager.UpdateUIScoreText(_score);
+    }
+
+    public void UpdateAmmoCount(int updateValue)
+    {
+        _uiManager.UpdateUIAmmoCountText(updateValue);
     }
 
 }

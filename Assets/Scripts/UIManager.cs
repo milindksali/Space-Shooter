@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [SerializeField]    private Text _scoreText;
+    [SerializeField]    private Text _ammoCountText;
     [SerializeField]    private Image _livesImage;
     [SerializeField]    private Sprite[] _livesSprites;
     [SerializeField]    private Text _gameOverText;
@@ -26,15 +27,14 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public void UpdateUIScoreText(int scoreValue)
     {
         _scoreText.text = "Score: " + scoreValue;
+    }
+
+    public void UpdateUIAmmoCountText(int ammoCount)
+    {
+        _ammoCountText.text = "Ammo: " + ammoCount;
     }
 
     public void UpdateCurrentLives(int currentLives)
