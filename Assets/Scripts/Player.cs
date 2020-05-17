@@ -102,6 +102,10 @@ public class Player : MonoBehaviour
                 }
             }
         }
+        if (_ammoCount < 7)     // Generate Ammo powerup when ammo count is lower than 7
+        {
+            _spawnManager.SetLowAmmo(true);
+        }
     }
 
     private void InitializeVariables()
@@ -142,7 +146,7 @@ public class Player : MonoBehaviour
         _speed = _normalSpeed;
 
         UpdateScore(_score);
-        UpdateAmmoCount(_ammoCount);
+        UpdateUIAmmoCount(_ammoCount);
     }
 
     void CalculateMovement()
@@ -229,8 +233,7 @@ public class Player : MonoBehaviour
         //Counted Triple shot as single ammo, considering Powerup !!
         //Hence ammo count is reduced by 1 out of if structure. 
         //Otherwise can reduce 3 ammo when it's a triple shot, and reduce 1 for regular shot within if condition above.
-        _ammoCount--;
-        UpdateAmmoCount(_ammoCount);
+        UpdateUIAmmoCount(--_ammoCount);
     }
 
     public void Damage()
@@ -311,9 +314,15 @@ public class Player : MonoBehaviour
         _uiManager.UpdateUIScoreText(_score);
     }
 
-    public void UpdateAmmoCount(int updateValue)
+    public void UpdateUIAmmoCount(int updateValue)
     {
         _uiManager.UpdateUIAmmoCountText(updateValue);
     }
 
+    public void IncreaseAmmoCount(int value)
+    {
+        _spawnManager.SetLowAmmo(false);
+        _ammoCount += value;
+        UpdateUIAmmoCount(_ammoCount);
+    }
 }

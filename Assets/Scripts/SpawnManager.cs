@@ -8,9 +8,15 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]    private GameObject _enemyContainer;
     
     private bool _stopSpawning = false;
+    private bool _lowAmmo = false;
 
     [SerializeField]    private GameObject[] _powerups;
     [SerializeField]    private GameObject _powerupContainer;
+
+    public void SetLowAmmo(bool value)
+    {
+        _lowAmmo = value;
+    }
 
     public void StartSpawning()
     {
@@ -37,7 +43,15 @@ public class SpawnManager : MonoBehaviour
         while (_stopSpawning == false)
         {
             yield return new WaitForSeconds(Random.Range(3.0f, 7.0f));
-            int powerupID = Random.Range(0, 3);
+            int powerupID;
+            if (_lowAmmo)
+            {
+                powerupID = 3;
+            }
+            else
+            {
+                powerupID = Random.Range(0, 3);
+            }
             GameObject newPowerup = Instantiate(_powerups[powerupID], new Vector3(Random.Range(-8.0f, 8.0f), 6f, 0), Quaternion.identity);
             newPowerup.transform.parent = _powerupContainer.transform;
         }
