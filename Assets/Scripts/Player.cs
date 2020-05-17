@@ -49,10 +49,21 @@ public class Player : MonoBehaviour
     private IEnumerator _deactivateSpeedPowerup;
     private IEnumerator _deactivateTripleShotPowerup;
 
+    private CameraShake _cameraShake;
+
+    private void Awake()
+    {
+        _cameraShake = GameObject.Find("Main Camera").GetComponent<CameraShake>();
+        if (_cameraShake == null)
+        {
+            Debug.LogError("Camera Shake instance is NULL!");
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        InitializeVariables();        
+        InitializeVariables();
     }
 
     // Update is called once per frame
@@ -239,6 +250,11 @@ public class Player : MonoBehaviour
 
     public void Damage()
     {
+        if (_cameraShake != null)
+        {
+            _cameraShake.ShakeCamera();
+        }
+        
         if (_isShieldPowerupActive == true)
         {
             _shieldStrength--;
