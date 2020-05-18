@@ -5,13 +5,14 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField]    private Text _scoreText;
-    [SerializeField]    private Text _ammoCountText;
-    [SerializeField]    private Image _livesImage;
-    [SerializeField]    private Sprite[] _livesSprites;
-    [SerializeField]    private Text _gameOverText;
-    [SerializeField]    private Text _restartText;
-    [SerializeField]    private GameManager _gameManager;
+    [SerializeField] private Text _scoreText;
+    [SerializeField] private Text _ammoCountText;
+    [SerializeField] private Image _livesImage;
+    [SerializeField] private Text _livesText;
+    [SerializeField] private Sprite[] _livesSprites;
+    [SerializeField] private Text _gameOverText;
+    [SerializeField] private Text _restartText;
+    [SerializeField] private GameManager _gameManager;
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +20,7 @@ public class UIManager : MonoBehaviour
         UpdateUIScoreText(0);
         _gameOverText.gameObject.SetActive(false);
         _restartText.gameObject.SetActive(false);
+        _livesText.gameObject.SetActive(false);
 
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if (_gameManager == null)
@@ -48,11 +50,22 @@ public class UIManager : MonoBehaviour
         {
             currentLives = 0;
         }
-        _livesImage.sprite = _livesSprites[currentLives];
+        if (currentLives <= 3)
+        {
+            _livesImage.sprite = _livesSprites[currentLives];
+            _livesText.gameObject.SetActive(false);
+            _livesText.text = "";
+        }
+        else
+        {
+            _livesImage.sprite = _livesSprites[3];
+            _livesText.text = "+" + (currentLives - 3);
+            _livesText.gameObject.SetActive(true);
+        }
+
         if (currentLives == 0)
         {
             GameOverSequence();
-
         }
     }
 

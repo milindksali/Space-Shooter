@@ -53,6 +53,9 @@ public class Powerup : MonoBehaviour
                     case 3:
                         player.IncreaseAmmoCount(15);
                         break;
+                    case 4: 
+                        player.LivesCollected();
+                        break;
                     default:
                         Debug.LogError("Invalid Powerup ID assigned");
                         break;

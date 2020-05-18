@@ -212,7 +212,6 @@ public class Player : MonoBehaviour
         BoundMovement();
     }
 
-
     void BoundMovement()
     {
         //Limit player to go beyond top/bottom limits
@@ -263,22 +262,8 @@ public class Player : MonoBehaviour
         }
 
         _lives--;
-        _uiManager.UpdateCurrentLives(_lives);
 
-        if (_lives == 2) 
-        {
-            _rightEngine.SetActive(true);
-        }
-        else if (_lives == 1)
-        {
-            _leftEngine.SetActive(true);
-        }
-
-        if (_lives < 1)
-        {
-            _spawnManager.OnPlayerDeath();
-            Destroy(this.gameObject);
-        }
+        UpdateLivesStatus();
     }
 
     public void ActivateTripleShotPowerup()
@@ -368,4 +353,38 @@ public class Player : MonoBehaviour
                 break;
         }
     }
+    public void LivesCollected()
+    {
+        _lives++;
+        _spawnManager.SetLowHealth(false);
+        UpdateLivesStatus();
+    }
+
+    private void UpdateLivesStatus()
+    {
+        _uiManager.UpdateCurrentLives(_lives);
+
+        if (_lives > 2)
+        {
+            _leftEngine.SetActive(false);
+            _rightEngine.SetActive(false);
+        }
+        else if (_lives == 2)
+        {
+            _leftEngine.SetActive(false);
+            _rightEngine.SetActive(true);
+        }
+        else if (_lives == 1)
+        {
+            _leftEngine.SetActive(true);
+            _spawnManager.SetLowHealth(true);
+        }
+
+        if (_lives < 1)
+        {
+            _spawnManager.OnPlayerDeath();
+            Destroy(this.gameObject);
+        }
+    }
+
 }

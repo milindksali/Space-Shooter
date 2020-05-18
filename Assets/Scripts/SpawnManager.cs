@@ -9,9 +9,27 @@ public class SpawnManager : MonoBehaviour
     
     private bool _stopSpawning = false;
     private bool _lowAmmo = false;
+    private bool _lowHealth = false;
 
     [SerializeField]    private GameObject[] _powerups;
     [SerializeField]    private GameObject _powerupContainer;
+
+    private Coroutine _healthPowerupCoroutine = null;
+
+    public void SetLowHealth(bool value)
+    {
+        _lowHealth = value;
+
+        //Stop any running Coroutine for health generation independent of low health value
+        //If low health is true start the coroutine again.
+        if (_healthPowerupCoroutine != null)
+            StopCoroutine(_healthPowerupCoroutine);
+        
+        if (_lowHealth)
+        {
+            _healthPowerupCoroutine =  StartCoroutine(SpawnHealthPowerupRoutine());
+        }
+    }
 
     public void SetLowAmmo(bool value)
     {
@@ -54,6 +72,17 @@ public class SpawnManager : MonoBehaviour
             }
             GameObject newPowerup = Instantiate(_powerups[powerupID], new Vector3(Random.Range(-8.0f, 8.0f), 6f, 0), Quaternion.identity);
             newPowerup.transform.parent = _powerupContainer.transform;
+        }
+    }
+
+    IEnumerator SpawnHealthPowerupRoutine()
+    {
+        yield return new WaitForSeconds(Random.Range(10.0f, 17.0f));
+        while (_lowHealth == true)
+        {
+            GameObject newPowerup = Instantiate(_powerups[4], new Vector3(Random.Range(-8.0f, 8.0f), 6f, 0), Quaternion.identity);
+            newPowerup.transform.parent = _powerupContainer.transform;
+            yield return new WaitForSeconds(Random.Range(10.0f, 15.0f));
         }
     }
 
