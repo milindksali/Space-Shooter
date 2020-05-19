@@ -40,7 +40,8 @@ public class Laser : MonoBehaviour
 
     void MoveUp()
     {
-        transform.Translate(Vector3.up * _speed * Time.deltaTime);
+        //transform.Translate(Vector3.up * _speed * Time.deltaTime);
+        transform.Translate(transform.up * _speed * Time.deltaTime);
 
         if (transform.position.y >= _LaserDestructionMaxHeight)
         {

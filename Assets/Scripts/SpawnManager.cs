@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    [SerializeField]    private GameObject _enemyPrefab;
-    [SerializeField]    private GameObject _enemyContainer;
-    
+    [SerializeField] private GameObject _enemyPrefab;
+    [SerializeField] private GameObject _enemyContainer;
+
     private bool _stopSpawning = false;
     private bool _lowAmmo = false;
     private bool _lowHealth = false;
 
-    [SerializeField]    private GameObject[] _powerups;
-    [SerializeField]    private GameObject _powerupContainer;
+    [SerializeField] private GameObject _powerupContainer;
+    [SerializeField] private GameObject[] _powerups;
+    [SerializeField] private GameObject[] _rarePowerups;
+    [SerializeField] private float _rarePowerupPercentage = 5.0f;
 
     private Coroutine _healthPowerupCoroutine = null;
 
@@ -24,10 +26,10 @@ public class SpawnManager : MonoBehaviour
         //If low health is true start the coroutine again.
         if (_healthPowerupCoroutine != null)
             StopCoroutine(_healthPowerupCoroutine);
-        
+
         if (_lowHealth)
         {
-            _healthPowerupCoroutine =  StartCoroutine(SpawnHealthPowerupRoutine());
+            _healthPowerupCoroutine = StartCoroutine(SpawnHealthPowerupRoutine());
         }
     }
 
@@ -40,6 +42,7 @@ public class SpawnManager : MonoBehaviour
     {
         StartCoroutine(SpawnEnemyRoutine());
         StartCoroutine(SpawnPowerupRoutine());
+        StartCoroutine(SpawnRarePowerupRoutine());
     }
 
     IEnumerator SpawnEnemyRoutine()
@@ -78,11 +81,27 @@ public class SpawnManager : MonoBehaviour
     IEnumerator SpawnHealthPowerupRoutine()
     {
         yield return new WaitForSeconds(Random.Range(10.0f, 17.0f));
-        while (_lowHealth == true)
+        while (_stopSpawning == false && _lowHealth == true)
         {
             GameObject newPowerup = Instantiate(_powerups[4], new Vector3(Random.Range(-8.0f, 8.0f), 6f, 0), Quaternion.identity);
             newPowerup.transform.parent = _powerupContainer.transform;
             yield return new WaitForSeconds(Random.Range(10.0f, 15.0f));
+        }
+    }
+
+    IEnumerator SpawnRarePowerupRoutine()
+    {
+        yield return new WaitForSeconds(Random.Range(10.0f, 17.0f));
+        while (_stopSpawning == false)
+        {
+            float randomValue = Random.value;
+            if (randomValue < (_rarePowerupPercentage/100))
+            {
+                int powerupID = Random.Range(0, _rarePowerups.Length);
+                GameObject newPowerup = Instantiate(_rarePowerups[powerupID], new Vector3(Random.Range(-8.0f, 8.0f), 6f, 0), Quaternion.identity);
+                newPowerup.transform.parent = _powerupContainer.transform;
+                yield return new WaitForSeconds(Random.Range(30.0f, 45.0f));
+            }
         }
     }
 

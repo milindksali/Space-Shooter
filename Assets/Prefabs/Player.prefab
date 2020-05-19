@@ -309,6 +309,10 @@ MonoBehaviour:
   _shieldVisual: {fileID: 8293156516340670129}
   _leftEngine: {fileID: 8293156516792506480}
   _rightEngine: {fileID: 8293156515928982608}
+  _shotPrefabs:
+  - {fileID: 8419875451594976972, guid: 21f1058ee8da9ba4a9867190e84f3d71, type: 3}
+  - {fileID: 1327136257281063948, guid: 5dadc12b1a9b84b42829ec93425ba705, type: 3}
+  - {fileID: 5966474638271480499, guid: bb7fdb9bdaaab85418c4b31289aa201e, type: 3}
   _tripleShotPrefab: {fileID: 1327136257281063948, guid: 5dadc12b1a9b84b42829ec93425ba705,
     type: 3}
   _laserPrefab: {fileID: 8419875451594976972, guid: 21f1058ee8da9ba4a9867190e84f3d71,
@@ -316,7 +320,6 @@ MonoBehaviour:
   _fireRate: 0.15
   _lives: 3
   _ammoOutSound: {fileID: 8300000, guid: d10a2b7fcb2dcd3428d1d8bd95d56a27, type: 3}
-  _shieldStrength: 3
   _score: 0
   _ammoCount: 15
 --- !u!61 &8293156516700990519

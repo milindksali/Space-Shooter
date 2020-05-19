@@ -23,8 +23,7 @@ public class Player : MonoBehaviour
     //Powerup variables
     [SerializeField]    private GameObject _shieldVisual;
     [SerializeField]    private GameObject _leftEngine, _rightEngine;
-    [SerializeField]    private GameObject _tripleShotPrefab;
-    [SerializeField]    private GameObject _laserPrefab;
+    [SerializeField] private GameObject[] _shotPrefabs;
     private float _laserOffset = 0.9f;
     [SerializeField]    private float _fireRate = 0.15f;
     private float _canFire = -1f;
@@ -41,13 +40,15 @@ public class Player : MonoBehaviour
     private bool _isSpeedPowerupActive = false;
     private bool _isShieldPowerupActive = false;
     private bool _isSpeedThrusterActive = false;
+    private bool _isMultiShotPowerupActive = false;
 
     //UI Display
     [SerializeField]    private int _score = 0;
     [SerializeField]    private int _ammoCount = 15;
 
     private IEnumerator _deactivateSpeedPowerup;
-    private IEnumerator _deactivateTripleShotPowerup;
+    private Coroutine _shotPowerupRoutine = null;
+
 
     private CameraShake _cameraShake;
 
@@ -232,13 +233,17 @@ public class Player : MonoBehaviour
     {
         _canFire = Time.time + _fireRate;
 
-        if (_isTripleShotPowerupActive == true)
-        { 
-            Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+        if (_isMultiShotPowerupActive == true)
+        {
+            Instantiate(_shotPrefabs[2], transform.position, Quaternion.identity);
+        }
+        else if (_isTripleShotPowerupActive == true)
+        {
+            Instantiate(_shotPrefabs[1], transform.position, Quaternion.identity);
         }
         else
         {
-            Instantiate(_laserPrefab, transform.position + new Vector3(0, _laserOffset, 0), Quaternion.identity);
+            Instantiate(_shotPrefabs[0], transform.position + new Vector3(0, _laserOffset, 0), Quaternion.identity);
         }
 
         //Counted Triple shot as single ammo, considering Powerup !!
@@ -266,18 +271,41 @@ public class Player : MonoBehaviour
         UpdateLivesStatus();
     }
 
-    public void ActivateTripleShotPowerup()
+    public void ActivateSuperShotPowerup(int powerupID)
     {
-        _isTripleShotPowerupActive = true;
+        _isTripleShotPowerupActive = false;
+        _isMultiShotPowerupActive = false;
 
-        //TODO: if same powerup is already activated, neglect remaining time and restart the coroutine for 5 seconds
-        if (_deactivateTripleShotPowerup != null)
+        if (_shotPowerupRoutine != null)
         {
-            StopCoroutine(_deactivateTripleShotPowerup);
+            StopCoroutine(_shotPowerupRoutine);
         }
-        _deactivateTripleShotPowerup = DeactivateTripleShotPowerup();
+        switch (powerupID)
+        {
+            case 0: //Triple-Shot
+                _isTripleShotPowerupActive = true;
+                _shotPowerupRoutine = StartCoroutine(DeactivateTripleShotPowerup());
+                break;
+            case 1: //Multi-Shot
+                _isMultiShotPowerupActive = true;
+                _shotPowerupRoutine = StartCoroutine(DeactivateMultiShotPowerup());
+                break;
+            default:
+                Debug.Log("New Shot Powerup ID received!! No details registered!");
+                break;
+        }
+    }
 
-        StartCoroutine(_deactivateTripleShotPowerup);
+    IEnumerator DeactivateTripleShotPowerup()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _isTripleShotPowerupActive = false;
+    }
+
+    IEnumerator DeactivateMultiShotPowerup()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _isMultiShotPowerupActive = false;
     }
 
     public void ActivateSpeedPowerup()
@@ -291,41 +319,16 @@ public class Player : MonoBehaviour
         StartCoroutine(_deactivateSpeedPowerup);
     }
 
-    public void ActivateShieldPowerup()
-    {
-        _shieldStrength = 3;
-        UpdateShieldStrength();
-    }
-
-    IEnumerator DeactivateTripleShotPowerup()
-    {
-        yield return new WaitForSeconds(5.0f);
-        _isTripleShotPowerupActive = false;
-    }
-
     IEnumerator DeactivateSpeedPowerup()
     {
         yield return new WaitForSeconds(5.0f);
         _isSpeedPowerupActive = false;
     }
 
-    public void UpdateScore(int updateValue)
+    public void ActivateShieldPowerup()
     {
-        _score += updateValue;
-
-        _uiManager.UpdateUIScoreText(_score);
-    }
-
-    public void UpdateUIAmmoCount(int updateValue)
-    {
-        _uiManager.UpdateUIAmmoCountText(updateValue);
-    }
-
-    public void IncreaseAmmoCount(int value)
-    {
-        _spawnManager.SetLowAmmo(false);
-        _ammoCount += value;
-        UpdateUIAmmoCount(_ammoCount);
+        _shieldStrength = 3;
+        UpdateShieldStrength();
     }
 
     public void UpdateShieldStrength()
@@ -353,6 +356,25 @@ public class Player : MonoBehaviour
                 break;
         }
     }
+
+    public void UpdateScore(int updateValue)
+    {
+        _score += updateValue;
+        _uiManager.UpdateUIScoreText(_score);
+    }
+
+    public void UpdateUIAmmoCount(int updateValue)
+    {
+        _uiManager.UpdateUIAmmoCountText(updateValue);
+    }
+
+    public void IncreaseAmmoCount(int value)
+    {
+        _spawnManager.SetLowAmmo(false);
+        _ammoCount += value;
+        UpdateUIAmmoCount(_ammoCount);
+    }
+
     public void LivesCollected()
     {
         _lives++;
@@ -386,5 +408,4 @@ public class Player : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-
 }

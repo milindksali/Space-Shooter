@@ -5,7 +5,7 @@ using UnityEngine;
 public class Powerup : MonoBehaviour
 {
     [SerializeField]    private float _speed = 3.0f;
-    [SerializeField]    private int _powerupID;     //0 = Tripleshot, 1 = Speed, 2 = Shield
+    [SerializeField]    private int _powerupID;
     [SerializeField]    private AudioClip _PowerupAudio;
 
     // Start is called before the first frame update
@@ -41,20 +41,23 @@ public class Powerup : MonoBehaviour
             {
                 switch (_powerupID)
                 {
-                    case 0: 
-                        player.ActivateTripleShotPowerup();
+                    case 0: //Triple-Shot
+                        player.ActivateSuperShotPowerup(0);
                         break;
-                    case 1:
+                    case 1: //Speed
                         player.ActivateSpeedPowerup();
                         break;
-                    case 2:
+                    case 2: //Shield
                         player.ActivateShieldPowerup();
                         break;
-                    case 3:
+                    case 3: //Ammo Kit
                         player.IncreaseAmmoCount(15);
                         break;
-                    case 4: 
+                    case 4: //Health
                         player.LivesCollected();
+                        break;
+                    case 5: //Multi-Shot
+                        player.ActivateSuperShotPowerup(1);
                         break;
                     default:
                         Debug.LogError("Invalid Powerup ID assigned");
