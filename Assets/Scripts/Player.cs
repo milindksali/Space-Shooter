@@ -82,6 +82,7 @@ public class Player : MonoBehaviour
             {
                 if (_ammoCount <= 0)
                 {
+                    _ammoCount = 0;
                     AudioSource.PlayClipAtPoint(_ammoOutSound, transform.position, 1.0f);
                 }
                 else
@@ -106,6 +107,7 @@ public class Player : MonoBehaviour
             {
                 if (_ammoCount <= 0)
                 {
+                    _ammoCount = 0;
                     AudioSource.PlayClipAtPoint(_ammoOutSound, transform.position, 1.0f);
                 }
                 else
@@ -114,8 +116,9 @@ public class Player : MonoBehaviour
                 }
             }
         }
-        if (_ammoCount < 7)     // Generate Ammo powerup when ammo count is lower than 7
+        if (_ammoCount <= 0)     // BugFix: Generate Ammo powerup ONLY when ammo count is ZERO
         {
+            _ammoCount = 0;
             _spawnManager.SetLowAmmo(true);
         }
     }
@@ -373,6 +376,8 @@ public class Player : MonoBehaviour
     {
         _spawnManager.SetLowAmmo(false);
         _ammoCount += value;
+        //Max Ammo cannot be more than 15
+        _ammoCount = (_ammoCount > 15) ? 15 : _ammoCount;
         UpdateUIAmmoCount(_ammoCount);
     }
 
