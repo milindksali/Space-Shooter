@@ -12,6 +12,9 @@ public class Player : MonoBehaviour
     [SerializeField]    private float _normalSpeed = 5.0f;
     [SerializeField]    private float _powerupSpeedMultiplier = 2.0f;
     [SerializeField]    private float _thrusterSpeedMultiplier = 1.5f;
+    private bool _canThrust = true;
+    private float _thrustRate = 0.05f;
+    private float _thrustRefillRate = 0.02f;
     private float _speed = 0f;
 
     //Movement Limits
@@ -65,6 +68,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         InitializeVariables();
+        StartCoroutine(ThrusterCoroutine());
     }
 
     // Update is called once per frame
@@ -72,11 +76,6 @@ public class Player : MonoBehaviour
     {
         if (_isPlayerOne == true)
         {
-            if (Input.GetKey(KeyCode.LeftShift) && _isSpeedPowerupActive == false)
-                _isSpeedThrusterActive = true;
-            else
-                _isSpeedThrusterActive = false;
-
             CalculateMovement();
 
             if ((Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)) && Time.time > _canFire)
@@ -94,12 +93,12 @@ public class Player : MonoBehaviour
 
         if (_isPlayerTwo == true)
         {
+            //TODO: Thruster implementation for Player 2 
             //Activate Thruster if Speedup is not active.
-            if (Input.GetKey(KeyCode.RightShift) && _isSpeedPowerupActive == false)
-                _isSpeedThrusterActive = true;
-            else
-                _isSpeedThrusterActive = false;
-
+            //if (Input.GetKey(KeyCode.RightShift) && _isSpeedPowerupActive == false)
+            //    _isSpeedThrusterActive = true;
+            //else
+            //    _isSpeedThrusterActive = false;
 
             CalculatePlayerTwoMovement();
 
@@ -160,6 +159,8 @@ public class Player : MonoBehaviour
 
         UpdateScore(_score);
         UpdateUIAmmoCount(_ammoCount);
+        _canThrust = true;
+        _uiManager.SetThrusterPower(0);
     }
 
     void CalculateMovement()
@@ -168,11 +169,11 @@ public class Player : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
         Vector3 direction = new Vector3(horizontalInput, verticalInput, 0);
 
-        if (_isSpeedPowerupActive == true)  //Speed up haas priority over Thruster
+        if (_isSpeedPowerupActive == true)  //Speed up has priority over Thruster
         {
             _speed = _normalSpeed * _powerupSpeedMultiplier;
         }
-        else if (_isSpeedThrusterActive == true)
+        else if (_isSpeedThrusterActive == true && _canThrust == true)
         {
             _speed = _normalSpeed * _thrusterSpeedMultiplier;
         }
@@ -406,6 +407,42 @@ public class Player : MonoBehaviour
         {
             _spawnManager.OnPlayerDeath();
             Destroy(this.gameObject);
+        }
+    }
+    IEnumerator ThrusterCoroutine()
+    {
+        yield return null;
+        while (true)
+        {
+            if (Input.GetKey(KeyCode.LeftShift) && _isSpeedPowerupActive == false) { 
+                if (_canThrust)
+                {
+                    float newThrustValue = _uiManager.ThrusterPower() - _thrustRate;
+                    if (newThrustValue <= 0)
+                    {
+                        _isSpeedThrusterActive = false;
+                        _uiManager.SetThrusterPower(0);
+                        _canThrust = false;
+                        yield return new WaitForSeconds(5.0f);  //Cooldown for 5 seconds then can refill the thruster power
+                    }
+                    else
+                    {
+                        _isSpeedThrusterActive = true;
+                        _uiManager.SetThrusterPower(newThrustValue);
+                    }
+                }
+            }
+            else    //LeftShift is not pressed, Refill Thruster
+            {
+                _isSpeedThrusterActive = false;
+                float newThrustValue = _uiManager.ThrusterPower() + _thrustRefillRate;
+
+                newThrustValue = (newThrustValue >= 1) ? 1 : newThrustValue;
+                _uiManager.SetThrusterPower(newThrustValue);
+
+                _canThrust = true;
+            }
+            yield return new WaitForSeconds(0.2f);
         }
     }
 }

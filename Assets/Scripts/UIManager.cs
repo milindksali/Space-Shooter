@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Text _gameOverText;
     [SerializeField] private Text _restartText;
     [SerializeField] private GameManager _gameManager;
+    [SerializeField] private Slider _thrusterSlider;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +22,8 @@ public class UIManager : MonoBehaviour
         _gameOverText.gameObject.SetActive(false);
         _restartText.gameObject.SetActive(false);
         _livesText.gameObject.SetActive(false);
+        _thrusterSlider.enabled = true;
+        _thrusterSlider.value = 0;
 
         _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
         if (_gameManager == null)
@@ -74,6 +77,7 @@ public class UIManager : MonoBehaviour
         _gameManager.GameOver();
         _gameOverText.gameObject.SetActive(true);
         _restartText.gameObject.SetActive(true);
+        _thrusterSlider.enabled = false;
         StartCoroutine(GameOverFlickerRoutine());
     }
 
@@ -88,4 +92,13 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void SetThrusterPower(float thrust)
+    {
+        _thrusterSlider.value = (thrust < 0 ? 0 : (thrust > 1 ? 1 : thrust));
+    }
+
+    public float ThrusterPower()
+    {
+        return _thrusterSlider.value;
+    }
 }
