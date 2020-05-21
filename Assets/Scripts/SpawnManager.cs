@@ -53,6 +53,9 @@ public class SpawnManager : MonoBehaviour
         {
             GameObject newEnemy = Instantiate(_enemyPrefab, new Vector3(Random.Range(-8f, 8f), 6f, 0), Quaternion.identity);
             newEnemy.transform.parent = _enemyContainer.transform;
+            Enemy enemy = newEnemy.GetComponent<Enemy>();
+            if (enemy != null)
+                enemy.EnemyType = Random.Range(0, 3);
             yield return new WaitForSeconds(5.0f);
         }
     }

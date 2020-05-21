@@ -4,17 +4,25 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField]    private float _speed = 2.0f;
-    [SerializeField]    private float _topVerticalStartPos = 6f;
-    [SerializeField]    private int _enemyKillPoints = 10;
-    [SerializeField]    private AudioClip _explosionSound;
-    [SerializeField]    private GameObject _enemyLaserPrefab;
+    [SerializeField] private float _speed = 2.0f;
+    [SerializeField] private float _topVerticalStartPos = 6f;
+    [SerializeField] private int _enemyType = 0;    //0 = Regular, 1 = moving side-by-side
+    [SerializeField] private int _enemyKillPoints = 10;
+    [SerializeField] private AudioClip _explosionSound;
+    [SerializeField] private GameObject _enemyLaserPrefab;
     private float _fireRate = 3.0f;
     private float _canFire = -1.0f;
     private bool _isEnemyDestroyed = false;
+    private bool isMovingRight = true;
 
     private Player _player;
     private Animator _animator;
+
+    public int EnemyType
+    {
+        get => _enemyType;
+        set => _enemyType = value;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -46,12 +54,59 @@ public class Enemy : MonoBehaviour
         {
             StartCoroutine(FireEnemyLaser());
         }
-        
     }
 
     private void CalculateMovement()
     {
-        transform.Translate(Vector3.down * _speed * Time.deltaTime);
+        Vector3 direction;
+        switch (_enemyType)
+        {
+            case 0: // Enemy moves downwards
+                direction = Vector3.down;
+                break;
+            case 1: // Enemy moves moving side-by-side
+                //Start from current position to right. 
+                // If reached to right boundary, move to left. and if reached to left boundary then move to right
+                direction = Vector3.down;
+                if (isMovingRight && transform.position.x <= 10f)
+                {
+                    direction = Vector3.right;
+                    isMovingRight = true;
+                }
+                else if ((isMovingRight && transform.position.x > 10f) || (!isMovingRight && transform.position.x >= -10f))
+                {
+                    direction = Vector3.left;
+                    isMovingRight = false;
+                }
+                else //if (!isMovingRight && transform.position.x <= -10f)
+                {
+                    direction = Vector3.right;
+                    isMovingRight = true;
+                }
+                break;
+            case 2: // Enemy moves in angle
+                if (isMovingRight && transform.position.x <= 10f)
+                {
+                    direction = new Vector3(1, -1, 0);
+                    isMovingRight = true;
+                }
+                else if ((isMovingRight && transform.position.x > 10f) || (!isMovingRight && transform.position.x >= -10f))
+                {
+                    direction = new Vector3(-1, -1, 0);
+                    isMovingRight = false;
+                }
+                else //if (!isMovingRight && transform.position.x <= -10f)
+                {
+                    direction = new Vector3(1, -1, 0);
+                    isMovingRight = true;
+                }
+                break;
+            default:
+                direction = Vector3.down;
+                break;
+        }
+        transform.Translate(direction * _speed * Time.deltaTime);
+        //transform.Translate(Vector3.down * _speed * Time.deltaTime);
 
         if (transform.position.y < -5.4f)
         {
