@@ -40,11 +40,11 @@ public class UIManager : MonoBehaviour
     public void UpdateUIAmmoCountText(int ammoCount)
     {
         if (ammoCount == 0)
-            _ammoCountText.text = "Ammo: " + ammoCount + " Out";
+            _ammoCountText.text = "Ammo: " + ammoCount + "/15 Out";
         else if (ammoCount < 7)
-            _ammoCountText.text = "Ammo: " + ammoCount + " Low";
+            _ammoCountText.text = "Ammo: " + ammoCount + "/15 Low";
         else
-            _ammoCountText.text = "Ammo: " + ammoCount;
+            _ammoCountText.text = "Ammo: " + ammoCount + "/15";
     }
 
     public void UpdateCurrentLives(int currentLives)
