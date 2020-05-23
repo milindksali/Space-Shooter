@@ -58,6 +58,7 @@ public class SpawnManager : MonoBehaviour
             {
                 enemy.EnemyType = Random.Range(0, 3);
                 enemy.IsAggressive = (Random.value < 0.8 ? false:true);
+                enemy.SetIsShieldActive((Random.value < 0.1 ? true : false));
             }
             yield return new WaitForSeconds(5.0f);
         }

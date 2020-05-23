@@ -12,6 +12,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private int _enemyKillPoints = 10;
     [SerializeField] private AudioClip _explosionSound;
     [SerializeField] private GameObject _enemyLaserPrefab;
+    [SerializeField] private GameObject _shieldsVisual;
     private float _fireRate = 3.0f;
     private float _canFire = -1.0f;
     private bool _isEnemyDestroyed = false;
@@ -23,6 +24,7 @@ public class Enemy : MonoBehaviour
     private Vector3 target;
     private bool targetIdentified = false;
     private Vector3 direction = Vector3.zero;
+    private bool _isShieldActive = false;
 
     public int EnemyType
     {
@@ -33,6 +35,17 @@ public class Enemy : MonoBehaviour
     {
         get => _isAggressive;
         set => _isAggressive = value;
+    }
+
+    public bool GetIsShieldActive()
+    {
+        return _isShieldActive;
+    }
+
+    public void SetIsShieldActive(bool value)
+    {
+        _isShieldActive = value;
+        _shieldsVisual.SetActive(value);
     }
 
     // Start is called before the first frame update
@@ -54,6 +67,11 @@ public class Enemy : MonoBehaviour
         if (_explosionSound == null)
         {
             Debug.LogError("Enemy explosion sound is NULL");
+        }
+
+        if (_shieldsVisual == null)
+        {
+            Debug.LogError("Enemy Shilds Visual is NULL");
         }
     }
 
@@ -165,13 +183,17 @@ public class Enemy : MonoBehaviour
                 _player.Damage();
             }
 
-            _speed = 0f;
-            Destroy(GetComponent<Collider2D>());
+            if (!GetIsShieldActive())
+            {
+                _speed = 0f;
+                Destroy(GetComponent<Collider2D>());
 
-            _animator.SetTrigger("OnEnemyDeath");
-            AudioSource.PlayClipAtPoint(_explosionSound, transform.position, 1.0f);
+                _animator.SetTrigger("OnEnemyDeath");
+                AudioSource.PlayClipAtPoint(_explosionSound, transform.position, 1.0f);
 
-            Destroy(this.gameObject, 2.8f);
+                Destroy(this.gameObject, 2.8f);
+            }
+            SetIsShieldActive(false);
         }
 
         if (other.tag == "Laser")
@@ -184,20 +206,24 @@ public class Enemy : MonoBehaviour
                     //Debug.Log("This is Enemy Laser, Do not Kill Enemy");
                     return;
                 }
-                
-                _isEnemyDestroyed = true;   //Enemy should not be able to fire now
-                Destroy(GetComponent<Collider2D>());
-                _animator.SetTrigger("OnEnemyDeath");
-                _speed = 0f;
-                AudioSource.PlayClipAtPoint(_explosionSound, transform.position, 1.0f);
                 Destroy(other.gameObject);
 
-                if (_player != null)
+                if (!GetIsShieldActive())
                 {
-                    _player.UpdateScore(_enemyKillPoints);
-                }
+                    _isEnemyDestroyed = true;   //Enemy should not be able to fire now
+                    Destroy(GetComponent<Collider2D>());
+                    _animator.SetTrigger("OnEnemyDeath");
+                    _speed = 0f;
+                    AudioSource.PlayClipAtPoint(_explosionSound, transform.position, 1.0f);
 
-                Destroy(this.gameObject, 2.8f);
+                    if (_player != null)
+                    {
+                        _player.UpdateScore(_enemyKillPoints);
+                    }
+
+                    Destroy(this.gameObject, 2.8f);
+                }
+                SetIsShieldActive(false);
             }
         }
     }
