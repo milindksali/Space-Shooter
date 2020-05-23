@@ -48,7 +48,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 4
+  _enemyAggressionSpeedMultiplier: 1.5
   _topVerticalStartPos: 6
+  _enemyType: 0
   _enemyKillPoints: 10
   _explosionSound: {fileID: 8300000, guid: a885c043fab7e46438bba03ba9dab6bc, type: 3}
   _enemyLaserPrefab: {fileID: 6938311935780515141, guid: d648b851ca3cb024d85c7ac62584de7c,

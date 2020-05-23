@@ -5,8 +5,10 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] private float _speed = 2.0f;
+    [SerializeField] private float _enemyAggressionSpeedMultiplier = 1.5f;
     [SerializeField] private float _topVerticalStartPos = 6f;
     [SerializeField] private int _enemyType = 0;    //0 = Regular, 1 = moving side-by-side
+    [SerializeField] private bool _isAggressive = false;
     [SerializeField] private int _enemyKillPoints = 10;
     [SerializeField] private AudioClip _explosionSound;
     [SerializeField] private GameObject _enemyLaserPrefab;
@@ -14,14 +16,23 @@ public class Enemy : MonoBehaviour
     private float _canFire = -1.0f;
     private bool _isEnemyDestroyed = false;
     private bool isMovingRight = true;
+    private float playerMaxDist = 4.0f;
 
     private Player _player;
     private Animator _animator;
+    private Vector3 target;
+    private bool targetIdentified = false;
+    private Vector3 direction = Vector3.zero;
 
     public int EnemyType
     {
         get => _enemyType;
         set => _enemyType = value;
+    }
+    public bool IsAggressive
+    {
+        get => _isAggressive;
+        set => _isAggressive = value;
     }
 
     // Start is called before the first frame update
@@ -58,59 +69,75 @@ public class Enemy : MonoBehaviour
 
     private void CalculateMovement()
     {
-        Vector3 direction;
-        switch (_enemyType)
+        if (_player != null)
         {
-            case 0: // Enemy moves downwards
-                direction = Vector3.down;
-                break;
-            case 1: // Enemy moves moving side-by-side
-                //Start from current position to right. 
-                // If reached to right boundary, move to left. and if reached to left boundary then move to right
-                direction = Vector3.down;
-                if (isMovingRight && transform.position.x <= 10f)
-                {
-                    direction = Vector3.right;
-                    isMovingRight = true;
-                }
-                else if ((isMovingRight && transform.position.x > 10f) || (!isMovingRight && transform.position.x >= -10f))
-                {
-                    direction = Vector3.left;
-                    isMovingRight = false;
-                }
-                else //if (!isMovingRight && transform.position.x <= -10f)
-                {
-                    direction = Vector3.right;
-                    isMovingRight = true;
-                }
-                break;
-            case 2: // Enemy moves in angle
-                if (isMovingRight && transform.position.x <= 10f)
-                {
-                    direction = new Vector3(1, -1, 0);
-                    isMovingRight = true;
-                }
-                else if ((isMovingRight && transform.position.x > 10f) || (!isMovingRight && transform.position.x >= -10f))
-                {
-                    direction = new Vector3(-1, -1, 0);
-                    isMovingRight = false;
-                }
-                else //if (!isMovingRight && transform.position.x <= -10f)
-                {
-                    direction = new Vector3(1, -1, 0);
-                    isMovingRight = true;
-                }
-                break;
-            default:
-                direction = Vector3.down;
-                break;
+            if ((Vector3.Distance(transform.position, _player.transform.position) <= playerMaxDist) 
+                && !targetIdentified 
+                && (transform.position.y > (_player.transform.position.y + 0.25f))
+                && (IsAggressive))
+            {
+                targetIdentified = true;
+                target = new Vector3(_player.transform.position.x, _player.transform.position.y, 0f);
+                direction = (target - transform.position).normalized * _enemyAggressionSpeedMultiplier;
+            }
         }
+
+        if (!targetIdentified)
+        {
+            switch (_enemyType)
+            {
+                case 0: // Enemy moves downwards
+                    direction = Vector3.down;
+                    break;
+                case 1: // Enemy moves moving side-by-side
+                        //Start from current position to right. 
+                        // If reached to right boundary, move to left. and if reached to left boundary then move to right
+                    direction = Vector3.down;
+                    if (isMovingRight && transform.position.x <= 10f)
+                    {
+                        direction = Vector3.right;
+                        isMovingRight = true;
+                    }
+                    else if ((isMovingRight && transform.position.x > 10f) || (!isMovingRight && transform.position.x >= -10f))
+                    {
+                        direction = Vector3.left;
+                        isMovingRight = false;
+                    }
+                    else //if (!isMovingRight && transform.position.x <= -10f)
+                    {
+                        direction = Vector3.right;
+                        isMovingRight = true;
+                    }
+                    break;
+                case 2: // Enemy moves in angle
+                    if (isMovingRight && transform.position.x <= 10f)
+                    {
+                        direction = new Vector3(1, -1, 0);
+                        isMovingRight = true;
+                    }
+                    else if ((isMovingRight && transform.position.x > 10f) || (!isMovingRight && transform.position.x >= -10f))
+                    {
+                        direction = new Vector3(-1, -1, 0);
+                        isMovingRight = false;
+                    }
+                    else //if (!isMovingRight && transform.position.x <= -10f)
+                    {
+                        direction = new Vector3(1, -1, 0);
+                        isMovingRight = true;
+                    }
+                    break;
+                default:
+                    direction = Vector3.down;
+                    break;
+            }
+        }
+
         transform.Translate(direction * _speed * Time.deltaTime);
-        //transform.Translate(Vector3.down * _speed * Time.deltaTime);
 
         if (transform.position.y < -5.4f)
         {
             transform.position = new Vector3(Random.Range(-8f, 8f), _topVerticalStartPos, 0);
+            targetIdentified = false;
         }
     }
 

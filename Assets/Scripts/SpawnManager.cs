@@ -55,7 +55,10 @@ public class SpawnManager : MonoBehaviour
             newEnemy.transform.parent = _enemyContainer.transform;
             Enemy enemy = newEnemy.GetComponent<Enemy>();
             if (enemy != null)
+            {
                 enemy.EnemyType = Random.Range(0, 3);
+                enemy.IsAggressive = (Random.value < 0.8 ? false:true);
+            }
             yield return new WaitForSeconds(5.0f);
         }
     }
